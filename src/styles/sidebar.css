@@ -18,9 +18,5 @@
     font-size: 18px;
     font-weight: bold;
     color: white;
-}
-.authButtons {
-    font-size: 14px;
-    font-family: 'Times New Roman', Times, serif;
-    color: #B8C5CC;
+    cursor: pointer;
 }

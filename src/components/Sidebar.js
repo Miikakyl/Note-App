@@ -7,8 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const Sidebar = () => {
     return (
-        <div className="col-lg-2 col-md-12 pt-5 pb-3 px-5 d-flex flex-column justify-content-between" style={{ backgroundColor: "#373A47" }}>
-            <div>
+        <div className="col-lg-2 col-md-12 pt-5 pb-3 px-5 d-flex flex-column" style={{ backgroundColor: "#373A47" }}>
                 <div className="d-flex justify-content-center">
                     <div className="logo">
                         <SaveAsIcon sx={{ fontSize: 55, color: "#935568" }} />
@@ -26,11 +25,6 @@ const Sidebar = () => {
                         <h4 className="sidebarOptions px-2">Deleted</h4>
                     </div>
                 </div>
-            </div>
-            <div className="d-flex justify-content-between">
-                <h4 className="authButtons">SIGN IN</h4>
-                <h4 className="authButtons">REGISTER</h4>
-            </div>
         </div>
     );
 }
