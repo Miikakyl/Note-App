@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { FIREBASE_AUTH } from "../firebaseConfig.js"
+import { DB } from "../firebaseConfig.js";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore"; 
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -19,9 +21,6 @@ const AuthenticationModal = () => {
     const signIn = () => {
         signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
           .then((userCredential) => {
-            // Signed in 
-            const user = userCredential.user;
-            console.log(user.uid)
             setShow(false)
             // ...
           })
@@ -38,13 +37,21 @@ const AuthenticationModal = () => {
                 // Signed up 
                 const user = userCredential.user;
                 setAuthMessage("Your registration is complete. Now Sign In")
+                createNoteDocument(user.uid)
             })
             .catch((error) => {
-                const errorCode = error.code;
                 const errorMessage = error.message;
                 setAuthMessage(errorMessage);
                 // ..
             });
+    }
+
+    /*Creates document that holds user's deleted and saved notes. Document name is equal to user's uid*/
+    const createNoteDocument = async (uid) => {
+        await setDoc(doc(DB, "Notes", uid), {
+            notes: [],
+            deleted: []
+        });
     }
 
     return (
