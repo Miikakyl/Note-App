@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
 import { DB } from "../firebaseConfig.js";
 
-import "../styles/writing.css";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleUp';
+import "../styles/styles.css";
 
 const Writing = ({ uid, note }) => {
     const [header, setHeader] = useState("")
     const [text, setText] = useState("")
     const [isNewNote, setIsNewNote] = useState(true)
     const [noteId, setNoteId] = useState(null)
+    const [collapseOn,setCollapseOn] = useState(false)
 
     /*When opening saved note header and text values are added*/
     useEffect(() => {
@@ -23,14 +26,22 @@ const Writing = ({ uid, note }) => {
         }
     }, [note])
 
+
     const saveNote = async () => {
+        const currentDate = new Date()
+        const formattedDate = currentDate.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: '2-digit'
+        })
+
         if (header && text) {
             const ref = doc(DB, "Notes", uid)
             await updateDoc(ref, {
                 notes: arrayUnion({
                     header: header,
                     text: text,
-                    timestamp: "1D",
+                    timestamp: formattedDate,
                     id: noteId
                 })
             });
@@ -73,9 +84,17 @@ const Writing = ({ uid, note }) => {
     }
 
     return (
-        <div className="col-lg-8 col-md-12" style={{ borderLeft: "1px solid #B8C5CC", backgroundColor: "#5500FF" }}>
+        <div className={`col-lg-8 col-12 ${collapseOn? "collapseOn" : null}`} style={{ borderLeft: "1px solid #B8C5CC", backgroundColor: "#0d6efd " }}>
+            <div className="row d-block d-sm-none">
+                <div className="col-12 py-2">
+                    <ArrowCircleUpIcon
+                        onClick={() => setCollapseOn(!collapseOn)}
+                        sx={{fontSize: 40,color:"white"}}
+                    />
+                </div>
+            </div>
             <div className="row h-75 g-0">
-                <div className="col-11 py-5 p-3 m-0 h-100">
+                <div className="col-10 py-5 p-3 m-0 h-100">
                     <input
                         className="headerSection mb-2"
                         placeholder="a new note"
@@ -89,7 +108,7 @@ const Writing = ({ uid, note }) => {
                         onChange={(e) => setText(e.target.value)}
                     />
                 </div>
-                <div className="col-1 pt-5">
+                <div className="col-2 pt-5 p-0">
                     <DeleteIcon className="deleteIcon" sx={{ fontSize: 40, color: "white" }} onClick={isNewNote ? null : deleteNote} />
                     <h5 className="saveButton" onClick={isNewNote ? saveNote : updateNote}>{isNewNote ? "Save" : "Update"}</h5>
                 </div>
