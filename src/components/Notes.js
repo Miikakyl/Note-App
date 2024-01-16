@@ -2,16 +2,17 @@ import React, { useState, useEffect } from "react"
 import { doc, onSnapshot } from "firebase/firestore";
 import { DB } from "../firebaseConfig.js";
 
-import "../styles/notes.css"
+import "../styles/styles.css";
 
-const Notes = ({ uid, passNoteParameters}) => {
-    const [noteData, setNoteData] = useState([])
-    const [isSelected, setIsSelected] = useState(false)
+const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch,isSignIn }) => {
+    const [noteData, setNoteData] = useState(null)
+    const [currentUser, setCurrentUser] = useState("")
+    const [selectedNote, setSelectedNote] = useState(null)
 
     useEffect(() => {
         if (uid) {
             const ref = doc(DB, 'Notes', uid);
-
+            setCurrentUser(email)
             const unsubscribe = onSnapshot(ref, (doc) => {
                 if (doc.exists()) {
                     handleNotes(doc.data().notes)
@@ -19,14 +20,19 @@ const Notes = ({ uid, passNoteParameters}) => {
                     setNoteData(null);
                 }
             });
-
             return () => unsubscribe();
         }
     }, [uid])
 
+    /* When user click new note button the green highlight of the selected note is disabled */
+    useEffect(() => {
+        setSelectedNote(null)
+    }, [noteHighlightSwitch])
+
+
     const handleNoteClick = (note) => {
         passNoteParameters(note)
-        setIsSelected(true)
+        setSelectedNote(note.id)
     }
 
     /*Creates preview properties from text and header properties to fit in the preview div
@@ -34,18 +40,19 @@ const Notes = ({ uid, passNoteParameters}) => {
     const handleNotes = (notes) => {
         let handledNotes = notes
         handledNotes.forEach(note => {
-            if (note.header.length > 33) {
-                let shortendHeader = note.header.slice(0, 33)
+            if (note.header.length > 22) {
+                let shortendHeader = note.header.slice(0, 22)
                 note.preHeader = shortendHeader + "..."
-                console.log(note.preHeader)
             }
-            if (note.text.length > 100) {
-                let shortendText = note.text.slice(0, 100)
+            if (note.text.length > 85) {
+                let shortendText = note.text.slice(0, 85)
                 note.preText = shortendText + "..."
             }
-            else {
-                note.preHeader = note.header
+            if (note.text.length < 85) {
                 note.preText = note.text
+            }
+            if (note.header.length < 22) {
+                note.preHeader = note.header
             }
         })
         setNoteData(handledNotes.reverse())
@@ -53,23 +60,24 @@ const Notes = ({ uid, passNoteParameters}) => {
 
 
     return (
-        <div className="notesContainer col-lg-3 col-md-12 p-0">
-            <div
-                className="createNote d-flex justify-content-center align-items-center"
-                onClick={() => passNoteParameters(null)}
-            >
-                <h5>Write a note</h5>
+        <div className="notesContainer col-lg-3 col-md-12 px-3">
+            <div className="topBar px-3 py-5 d-flex justify-content-between position-sticky">
+                <h4 className="currentUser">{currentUser}</h4>
+                <h4
+                    onClick={() => signOut()}
+                    className="signOutButton">Sign Out
+                </h4>
             </div>
-
-            {noteData.map((note) => (
-                <div 
-                    className="savedNote d-flex align-items-center p-3"
+            <h4>Your Notes</h4>
+            {noteData && noteData.map((note) => (
+                <div
+                    className={`savedNote d-flex align-items-center p-3 mb-3 ${selectedNote === note.id ? 'selectedSaved' : ''}`}
                     onClick={() => handleNoteClick(note)}
                     key={note.id}
-                    >
+                >
                     <h5 className="savedNoteTimestamp">{note.timestamp}</h5>
                     <div className="savedNoteTextContainer d-flex flex-column justify-content-start px-4">
-                        <h4 className="savedNoteHeader">{note.preHeader}</h4>
+                        <h4 className="savedNotePreviewHeader">{note.preHeader}</h4>
                         <h4 className="savedNotePreviewText">{note.preText}</h4>
                     </div>
                 </div>
