@@ -2,7 +2,6 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { FIREBASE_AUTH } from "./firebaseConfig.js";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import AlertMsg from "./components/AlertMsg.js";
 
 import Sidebar from "./components/Sidebar";
 import Notes from "./components/Notes";
@@ -16,6 +15,7 @@ const App = () => {
     const [userData, setUserData] = useState("")
     const [note, setNote] = useState("")
     const [noteHighlightSwitch, setNoteHighlightSwitch] = useState(false)
+    const [removedNotesShow, setRemovedNotesShow] = useState(false)
 
     useEffect(() => {
         onAuthStateChanged(FIREBASE_AUTH, (user) => {
@@ -63,20 +63,24 @@ const App = () => {
 
         return (
             <div className="container-fluid h-100 position-relative" style={{ overflowX: "hidden" }}>
-                {/* <AlertMsg /> */}
                 <div className="row d-flex h-100">
                     {isSignIn ? null : <AuthenticationModal />}
-                    <Sidebar createNewNote={passNoteParameters} />
+                    <Sidebar 
+                        createNewNote={passNoteParameters}
+                        setRemovedNotesShow={setRemovedNotesShow}
+                    />
                     <Notes
                         uid={userData.uid}
                         passNoteParameters={passNoteParameters}
                         email={userData.email}
                         signOut={handleSignOut}
                         noteHighlightSwitch={noteHighlightSwitch}
+                        removedNotesShow={removedNotesShow}
                     />
                     <Writing 
                         uid={userData.uid} note={note}
                         isSignIn={isSignIn}
+                        removedNotesShow={removedNotesShow}
                     />
                 </div>
             </div>
