@@ -4,7 +4,7 @@ import { DB } from "../firebaseConfig.js";
 
 import "../styles/styles.css";
 
-const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch,isSignIn }) => {
+const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, removedNotesShow }) => {
     const [noteData, setNoteData] = useState(null)
     const [currentUser, setCurrentUser] = useState("")
     const [selectedNote, setSelectedNote] = useState(null)
@@ -15,14 +15,16 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch,is
             setCurrentUser(email)
             const unsubscribe = onSnapshot(ref, (doc) => {
                 if (doc.exists()) {
-                    handleNotes(doc.data().notes)
+                    handleNotes(removedNotesShow ? doc.data().removed : doc.data().notes)
+                    setSelectedNote(null)
+
                 } else {
                     setNoteData(null);
                 }
             });
             return () => unsubscribe();
         }
-    }, [uid])
+    }, [uid, removedNotesShow])
 
     /* When user click new note button the green highlight of the selected note is disabled */
     useEffect(() => {
@@ -68,10 +70,12 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch,is
                     className="signOutButton">Sign Out
                 </h4>
             </div>
-            <h4>Your Notes</h4>
+            <h4>{removedNotesShow ? "Removed Notes" : "Your Notes"}</h4>
             {noteData && noteData.map((note) => (
                 <div
-                    className={`savedNote d-flex align-items-center p-3 mb-3 ${selectedNote === note.id ? 'selectedSaved' : ''}`}
+                    className={`savedNote d-flex align-items-center p-3 mb-3 ${selectedNote === note.id ? (removedNotesShow ? "selectedDeleted" : "selectedSaved") : ""
+                        }`}
+
                     onClick={() => handleNoteClick(note)}
                     key={note.id}
                 >

@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react"
+import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore"
 import { DB } from "../firebaseConfig.js";
 
-import DeleteIcon from '@mui/icons-material/Delete';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleUp';
-import "../styles/styles.css";
+import DeleteIcon from '@mui/icons-material/Delete'
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp'
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleUp'
+import "../styles/styles.css"
 
-const Writing = ({ uid, note }) => {
+const Writing = ({ uid, note, removedNotesShow }) => {
     const [header, setHeader] = useState("")
     const [text, setText] = useState("")
     const [isNewNote, setIsNewNote] = useState(true)
     const [noteId, setNoteId] = useState(null)
-    const [collapseOn,setCollapseOn] = useState(false)
+    const [collapseOn, setCollapseOn] = useState(false)
 
     /*When opening saved note header and text values are added*/
     useEffect(() => {
         setIsNewNote(true)
-
         setNoteId(note.id)
         setHeader(note.header)
         setText(note.text)
@@ -26,8 +25,18 @@ const Writing = ({ uid, note }) => {
         }
     }, [note])
 
+    useEffect(() => {
+        if (!removedNotesShow) {
+            setHeader("")
+            setText("")
+            setIsNewNote(true)
+        }
+    }, [removedNotesShow])
+
+    
 
     const saveNote = async () => {
+        const ref = doc(DB, "Notes", uid)
         const currentDate = new Date()
         const formattedDate = currentDate.toLocaleDateString('en-GB', {
             day: '2-digit',
@@ -35,8 +44,8 @@ const Writing = ({ uid, note }) => {
             year: '2-digit'
         })
 
+        /*If the text doesn't have both text and header it won't be saved */
         if (header && text) {
-            const ref = doc(DB, "Notes", uid)
             await updateDoc(ref, {
                 notes: arrayUnion({
                     header: header,
@@ -50,9 +59,8 @@ const Writing = ({ uid, note }) => {
     }
 
     const updateNote = async () => {
-        const ref = doc(DB, "Notes", uid);
-
-        const docSnap = await getDoc(ref);
+        const ref = doc(DB, "Notes", uid)
+        const docSnap = await getDoc(ref)
 
         const noteArray = docSnap.data().notes
         const indexOfUpdatableNote = noteArray.findIndex((note) => note.id === noteId)
@@ -62,21 +70,53 @@ const Writing = ({ uid, note }) => {
         await updateDoc(ref, {
             notes: noteArray
         })
-
     }
 
-    const deleteNote = async () => {
-        const ref = doc(DB, "Notes", uid);
-
-        const docSnap = await getDoc(ref);
+    /*First the note is deleted from Notes property and then moved to removed*/
+    const removeNote = async () => {
+        const ref = doc(DB, "Notes", uid)
+        const docSnap = await getDoc(ref)
 
         const noteArray = docSnap.data().notes
         const updatedNoteArray = noteArray.filter((note) => note.id !== noteId)
-
-        console.log(updatedNoteArray)
+        const removedItem = noteArray.filter((note) => note.id === noteId)
 
         await updateDoc(ref, {
-            notes: updatedNoteArray
+            notes: updatedNoteArray,
+            removed: arrayUnion(
+                removedItem[0]
+            )
+        })
+        setHeader("")
+        setText("")
+        setIsNewNote(true)
+    }
+
+    const restoreNote = async () => {
+        const ref = doc(DB, "Notes", uid)
+        const docSnap = await getDoc(ref)
+
+        const removedArray = docSnap.data().removed
+        const updatedRemovedArray = removedArray.filter((note) => note.id !== noteId)
+
+        await updateDoc(ref, {
+            notes: arrayUnion(note),
+            removed: updatedRemovedArray
+        })
+        setHeader("")
+        setText("")
+        setIsNewNote(true)
+    }
+
+    const deleteNote = async () => {
+        const ref = doc(DB, "Notes", uid)
+        const docSnap = await getDoc(ref)
+
+        const removedArray = docSnap.data().removed
+        const updatedRemovedArray = removedArray.filter((note) => note.id !== noteId)
+
+        await updateDoc(ref, {
+            removed: updatedRemovedArray
         })
         setHeader("")
         setText("")
@@ -84,33 +124,37 @@ const Writing = ({ uid, note }) => {
     }
 
     return (
-        <div className={`col-lg-8 col-12 ${collapseOn? "collapseOn" : null}`} style={{ borderLeft: "1px solid #B8C5CC", backgroundColor: "#0d6efd " }}>
+        <div className={`col-lg-8 col-12 bg-primary writingContainer ${collapseOn ? "collapseOn" : null}`}>
             <div className="row d-block d-sm-none">
                 <div className="col-12 py-2">
                     <ArrowCircleUpIcon
                         onClick={() => setCollapseOn(!collapseOn)}
-                        sx={{fontSize: 40,color:"white"}}
+                        sx={{ fontSize: 40, color: "white" }}
                     />
                 </div>
             </div>
             <div className="row h-75 g-0">
                 <div className="col-10 py-5 p-3 m-0 h-100">
                     <input
-                        className="headerSection mb-2"
-                        placeholder="a new note"
+                        disabled={removedNotesShow ? true : false}
+                        className="headerSection mb-2 bg-primary"
+                        placeholder={removedNotesShow ? "Select the note" : "a new note"}
                         value={header}
                         onChange={(e) => setHeader(e.target.value)}
                     />
                     <textarea
-                        className="textSection"
-                        placeholder="Start writing here..."
+                        disabled={removedNotesShow ? true : false}
+                        className="textSection bg-primary"
+                        placeholder={removedNotesShow ? "you want to restore or delete" : "Start writing here..."}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                     />
                 </div>
                 <div className="col-2 pt-5 p-0">
-                    <DeleteIcon className="deleteIcon" sx={{ fontSize: 40, color: "white" }} onClick={isNewNote ? null : deleteNote} />
-                    <h5 className="saveButton" onClick={isNewNote ? saveNote : updateNote}>{isNewNote ? "Save" : "Update"}</h5>
+                    <DeleteIcon className="deleteIcon" sx={{ fontSize: 40, color: "white" }} onClick={ removedNotesShow? deleteNote : (isNewNote ? null : removeNote) } />
+                    <h5 className="saveButton" onClick={ removedNotesShow? restoreNote : (isNewNote ? saveNote : updateNote)}>
+                        { removedNotesShow? "Restore" : (isNewNote ? "Save" : "Update")}
+                    </h5>
                 </div>
             </div>
         </div>
