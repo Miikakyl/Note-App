@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react"
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore"
-import { DB } from "../firebaseConfig.js";
+import { DB } from "../firebaseConfig.js"
+import { v4 as uuidv4 } from 'uuid'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp'
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleUp'
+
 import "../styles/styles.css"
 
 const Writing = ({ uid, note, removedNotesShow }) => {
@@ -16,24 +18,33 @@ const Writing = ({ uid, note, removedNotesShow }) => {
 
     /*When opening saved note header and text values are added*/
     useEffect(() => {
+     
+        if (note?.header && note?.text) {
+            console.log("header and text")
+            setIsNewNote(false)
+            setNoteId(note.id)
+            setHeader(note.header)
+            setText(note.text)
+        }
+        else {
+            createEmptyNote()
+        }
+    }, [note])
+
+    const createEmptyNote = () => {
+        const newNoteId = uuidv4()
+        const note = {
+            header: "",
+            text: "",
+            timestamp: "1D",
+            id: newNoteId
+        }
+
         setIsNewNote(true)
         setNoteId(note.id)
         setHeader(note.header)
         setText(note.text)
-        if (note.header && note.text) {
-            setIsNewNote(false)
-        }
-    }, [note])
-
-    useEffect(() => {
-        if (!removedNotesShow) {
-            setHeader("")
-            setText("")
-            setIsNewNote(true)
-        }
-    }, [removedNotesShow])
-
-    
+    }
 
     const saveNote = async () => {
         const ref = doc(DB, "Notes", uid)
@@ -54,7 +65,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                     id: noteId
                 })
             });
-            setIsNewNote(false)
+            createEmptyNote()
         }
     }
 
@@ -87,9 +98,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                 removedItem[0]
             )
         })
-        setHeader("")
-        setText("")
-        setIsNewNote(true)
+        createEmptyNote()
     }
 
     const restoreNote = async () => {
@@ -103,9 +112,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
             notes: arrayUnion(note),
             removed: updatedRemovedArray
         })
-        setHeader("")
-        setText("")
-        setIsNewNote(true)
+        createEmptyNote()
     }
 
     const deleteNote = async () => {
@@ -118,9 +125,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
         await updateDoc(ref, {
             removed: updatedRemovedArray
         })
-        setHeader("")
-        setText("")
-        setIsNewNote(true)
+        createEmptyNote()
     }
 
     return (
@@ -151,9 +156,9 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                     />
                 </div>
                 <div className="col-2 pt-5 p-0">
-                    <DeleteIcon className="deleteIcon" sx={{ fontSize: 40, color: "white" }} onClick={ removedNotesShow? deleteNote : (isNewNote ? null : removeNote) } />
-                    <h5 className="saveButton" onClick={ removedNotesShow? restoreNote : (isNewNote ? saveNote : updateNote)}>
-                        { removedNotesShow? "Restore" : (isNewNote ? "Save" : "Update")}
+                    <DeleteIcon className="deleteIcon" sx={{ fontSize: 40, color: "white" }} onClick={removedNotesShow ? deleteNote : (isNewNote ? null : removeNote)} />
+                    <h5 className="saveButton" onClick={removedNotesShow ? restoreNote : (isNewNote ? saveNote : updateNote)}>
+                        {removedNotesShow ? "Restore" : (isNewNote ? "Save" : "Update")}
                     </h5>
                 </div>
             </div>

@@ -70,7 +70,7 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
                     className="signOutButton">Sign Out
                 </h4>
             </div>
-            <h4>{removedNotesShow ? "Removed Notes" : "Your Notes"}</h4>
+            <h4>{removedNotesShow ? "Removed Notes" : "Saved Notes"}</h4>
             {noteData && noteData.map((note) => (
                 <div
                     className={`savedNote d-flex align-items-center p-3 mb-3 ${selectedNote === note.id ? (removedNotesShow ? "selectedDeleted" : "selectedSaved") : ""
