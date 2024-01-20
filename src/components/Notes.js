@@ -16,7 +16,9 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
             const unsubscribe = onSnapshot(ref, (doc) => {
                 if (doc.exists()) {
                     handleNotes(removedNotesShow ? doc.data().removed : doc.data().notes)
-                    setSelectedNote(null)
+                    if(removedNotesShow) {
+                        setSelectedNote(null)
+                    }
 
                 } else {
                     setNoteData(null);
@@ -26,7 +28,7 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
         }
     }, [uid, removedNotesShow])
 
-    /* When user click new note button the green highlight of the selected note is disabled */
+    /* When user click new note button the highlight of the selected note is disabled */
     useEffect(() => {
         setSelectedNote(null)
     }, [noteHighlightSwitch])
@@ -75,7 +77,6 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
                 <div
                     className={`savedNote d-flex align-items-center p-3 mb-3 ${selectedNote === note.id ? (removedNotesShow ? "selectedDeleted" : "selectedSaved") : ""
                         }`}
-
                     onClick={() => handleNoteClick(note)}
                     key={note.id}
                 >

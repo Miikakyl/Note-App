@@ -1,7 +1,6 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { FIREBASE_AUTH } from "./firebaseConfig.js";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
 
 import Sidebar from "./components/Sidebar";
 import Notes from "./components/Notes";
@@ -25,8 +24,7 @@ const App = () => {
                     email: user.email
                 })
                 setIsSignIn(true)
-                const emptyNote = createEmptyNote()
-                passNoteParameters(emptyNote)
+                passNoteParameters()
             } else {
                 setIsSignIn(false)
             }
@@ -41,20 +39,8 @@ const App = () => {
         });
     }
 
-    const createEmptyNote = () => {
-        const newNoteId = uuidv4()
-        const note = {
-            header: "",
-            text: "",
-            timestamp: "1D",
-            id: newNoteId
-        }
-        return note
-    }
-
     const passNoteParameters = (note) => {
-        if (!note) {
-            note = createEmptyNote()
+        if (note === null) {
             setNoteHighlightSwitch(!noteHighlightSwitch)
         }
         setNote(note)
@@ -78,7 +64,8 @@ const App = () => {
                         removedNotesShow={removedNotesShow}
                     />
                     <Writing 
-                        uid={userData.uid} note={note}
+                        uid={userData.uid} 
+                        note={note}
                         isSignIn={isSignIn}
                         removedNotesShow={removedNotesShow}
                     />

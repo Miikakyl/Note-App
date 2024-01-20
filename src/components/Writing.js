@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp'
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleUp'
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown'
 
 import "../styles/styles.css"
 
@@ -18,9 +18,8 @@ const Writing = ({ uid, note, removedNotesShow }) => {
 
     /*When opening saved note header and text values are added*/
     useEffect(() => {
-     
+
         if (note?.header && note?.text) {
-            console.log("header and text")
             setIsNewNote(false)
             setNoteId(note.id)
             setHeader(note.header)
@@ -30,6 +29,12 @@ const Writing = ({ uid, note, removedNotesShow }) => {
             createEmptyNote()
         }
     }, [note])
+
+    /*When toggling between Saved notes and removed the empty note is always firstly showed */
+    useEffect(() => {
+        createEmptyNote()
+    }, [removedNotesShow])
+
 
     const createEmptyNote = () => {
         const newNoteId = uuidv4()
@@ -132,10 +137,18 @@ const Writing = ({ uid, note, removedNotesShow }) => {
         <div className={`col-lg-8 col-12 bg-primary writingContainer ${collapseOn ? "collapseOn" : null}`}>
             <div className="row d-block d-sm-none">
                 <div className="col-12 py-2">
-                    <ArrowCircleUpIcon
-                        onClick={() => setCollapseOn(!collapseOn)}
-                        sx={{ fontSize: 40, color: "white" }}
-                    />
+                    {!collapseOn &&
+                        <ArrowCircleUpIcon
+                            onClick={() => setCollapseOn(true)}
+                            sx={{ fontSize: 40, color: "white" }}
+                        />
+                    }
+                    {collapseOn &&
+                        <ArrowCircleDownIcon
+                            onClick={() => setCollapseOn(false)}
+                            sx={{ fontSize: 40, color: "white" }}
+                        />
+                    }
                 </div>
             </div>
             <div className="row h-75 g-0">
