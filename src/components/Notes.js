@@ -16,14 +16,19 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
             const ref = doc(DB, 'Notes', uid)
             setCurrentUser(email)
             const unsubscribe = onSnapshot(ref, (doc) => {
-                if (doc.exists()) {
-                    handleNotes(removedNotesShow ? doc.data().removed : doc.data().notes)
 
+                if (doc.exists()) {
+                    const response = doc.data()
                     if (removedNotesShow) {
+                        handleNotes(response ? response.removed : null)
                         setSelectedNote(null)
                     }
+                    else {
+                        handleNotes(response ? response.notes : null)
+                    }
 
-                } else {
+                }
+                else {
                     setNoteData(null);
                 }
             });
@@ -47,23 +52,26 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
     */
     const handleNotes = (notes) => {
         let handledNotes = notes
-        handledNotes.forEach(note => {
-            if (note.header.length > 22) {
-                let shortendHeader = note.header.slice(0, 22)
-                note.preHeader = shortendHeader + "..."
-            }
-            if (note.text.length > 85) {
-                let shortendText = note.text.slice(0, 85)
-                note.preText = shortendText + "..."
-            }
-            if (note.text.length < 85) {
-                note.preText = note.text
-            }
-            if (note.header.length < 22) {
-                note.preHeader = note.header
-            }
-        })
-        setNoteData(handledNotes.reverse())
+        
+        if (handledNotes) {
+            handledNotes.forEach(note => {
+                if (note.header.length > 22) {
+                    let shortendHeader = note.header.slice(0, 22)
+                    note.preHeader = shortendHeader + "..."
+                }
+                if (note.text.length > 85) {
+                    let shortendText = note.text.slice(0, 85)
+                    note.preText = shortendText + "..."
+                }
+                if (note.text.length < 85) {
+                    note.preText = note.text
+                }
+                if (note.header.length < 22) {
+                    note.preHeader = note.header
+                }
+            })
+            setNoteData(handledNotes.reverse())
+        }
     }
 
     return (
