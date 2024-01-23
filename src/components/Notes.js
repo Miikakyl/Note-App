@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from "react"
-import { doc, onSnapshot } from "firebase/firestore";
-import { DB } from "../firebaseConfig.js";
+import React, { useState, useEffect, useRef } from "react"
+import { doc, onSnapshot } from "firebase/firestore"
+import { DB } from "../firebaseConfig.js"
+import { motion } from "framer-motion"
 
 import "../styles/styles.css";
 
 const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, removedNotesShow }) => {
-    const [noteData, setNoteData] = useState(null)
+    const [noteData, setNoteData] = useState(false)
     const [currentUser, setCurrentUser] = useState("")
     const [selectedNote, setSelectedNote] = useState(null)
 
+
     useEffect(() => {
         if (uid) {
-            const ref = doc(DB, 'Notes', uid);
+            const ref = doc(DB, 'Notes', uid)
             setCurrentUser(email)
             const unsubscribe = onSnapshot(ref, (doc) => {
                 if (doc.exists()) {
                     handleNotes(removedNotesShow ? doc.data().removed : doc.data().notes)
-                    if(removedNotesShow) {
+
+                    if (removedNotesShow) {
                         setSelectedNote(null)
                     }
 
@@ -27,6 +30,7 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
             return () => unsubscribe();
         }
     }, [uid, removedNotesShow])
+
 
     /* When user click new note button the highlight of the selected note is disabled */
     useEffect(() => {
@@ -62,7 +66,6 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
         setNoteData(handledNotes.reverse())
     }
 
-
     return (
         <div className="notesContainer col-lg-3 col-md-12 px-3">
             <div className="topBar px-3 py-5 d-flex justify-content-between position-sticky">
@@ -73,8 +76,11 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
                 </h4>
             </div>
             <h4>{removedNotesShow ? "Removed Notes" : "Saved Notes"}</h4>
+
             {noteData && noteData.map((note) => (
-                <div
+                <motion.div
+                    initial={{ opacity: 0, y: "50px" }}
+                    animate={{ opacity: 1, y: "0px" }}
                     className={`savedNote d-flex align-items-center p-3 mb-3 ${selectedNote === note.id ? (removedNotesShow ? "selectedDeleted" : "selectedSaved") : ""
                         }`}
                     onClick={() => handleNoteClick(note)}
@@ -82,10 +88,12 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
                 >
                     <h5 className="savedNoteTimestamp">{note.timestamp}</h5>
                     <div className="savedNoteTextContainer d-flex flex-column justify-content-start px-4">
-                        <h4 className="savedNotePreviewHeader">{note.preHeader}</h4>
+                        <h4 className="savedNotePreviewHeader"
+                        >{note.preHeader}
+                        </h4>
                         <h4 className="savedNotePreviewText">{note.preText}</h4>
                     </div>
-                </div>
+                </motion.div>
             ))}
         </div>
     );

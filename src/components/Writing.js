@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore"
 import { DB } from "../firebaseConfig.js"
+import { motion } from "framer-motion"
 import { v4 as uuidv4 } from 'uuid'
 
 import DeleteIcon from '@mui/icons-material/Delete'
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp'
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown'
+
 
 import "../styles/styles.css"
 
@@ -15,10 +17,12 @@ const Writing = ({ uid, note, removedNotesShow }) => {
     const [isNewNote, setIsNewNote] = useState(true)
     const [noteId, setNoteId] = useState(null)
     const [collapseOn, setCollapseOn] = useState(false)
+    const popOverTarget = useRef(null)
+    const [showPopOver, setShowPopOver] = useState(null)
+
 
     /*When opening saved note header and text values are added*/
     useEffect(() => {
-
         if (note?.header && note?.text) {
             setIsNewNote(false)
             setNoteId(note.id)
@@ -35,6 +39,28 @@ const Writing = ({ uid, note, removedNotesShow }) => {
         createEmptyNote()
     }, [removedNotesShow])
 
+
+    useEffect(() => {
+        if (showPopOver) {
+            setTimeout(() => {
+                setShowPopOver(null)
+            }, 3000)
+        }
+    }, [showPopOver])
+
+    const createAnimatedPopOver = () => {
+        return (
+            <motion.div className="operationStateInfoSection"
+                style={{
+                    backgroundColor: showPopOver.type === "info" ? "#BBE0B6" : "#f0ad4e "
+                }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}>
+                <p className="operationStateMessage">{showPopOver.message}</p>
+            </motion.div>
+        )
+    }
 
     const createEmptyNote = () => {
         const newNoteId = uuidv4()
@@ -70,11 +96,22 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                     id: noteId
                 })
             });
+            setShowPopOver({
+                message: "The note was succesfully saved!",
+                type: "info"
+            })
             createEmptyNote()
+        }
+        else {
+            setShowPopOver({
+                message: "Add header and text to save",
+                type: "help"
+            })
         }
     }
 
     const updateNote = async () => {
+
         const ref = doc(DB, "Notes", uid)
         const docSnap = await getDoc(ref)
 
@@ -83,8 +120,13 @@ const Writing = ({ uid, note, removedNotesShow }) => {
         noteArray[indexOfUpdatableNote].header = header
         noteArray[indexOfUpdatableNote].text = text
 
+
         await updateDoc(ref, {
             notes: noteArray
+        })
+        setShowPopOver({
+            message: "The note was succesfully updated!",
+            type: "info"
         })
     }
 
@@ -97,6 +139,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
         const updatedNoteArray = noteArray.filter((note) => note.id !== noteId)
         const removedItem = noteArray.filter((note) => note.id === noteId)
 
+
         await updateDoc(ref, {
             notes: updatedNoteArray,
             removed: arrayUnion(
@@ -104,37 +147,61 @@ const Writing = ({ uid, note, removedNotesShow }) => {
             )
         })
         createEmptyNote()
+        setShowPopOver({
+            message: "The note was succesfully removed!",
+            type: "info"
+        })
     }
 
     const restoreNote = async () => {
-        const ref = doc(DB, "Notes", uid)
-        const docSnap = await getDoc(ref)
 
-        const removedArray = docSnap.data().removed
-        const updatedRemovedArray = removedArray.filter((note) => note.id !== noteId)
+        if (header && text) {
+            const ref = doc(DB, "Notes", uid)
+            const docSnap = await getDoc(ref)
 
-        await updateDoc(ref, {
-            notes: arrayUnion(note),
-            removed: updatedRemovedArray
-        })
-        createEmptyNote()
+            const removedArray = docSnap.data().removed
+            const updatedRemovedArray = removedArray.filter((note) => note.id !== noteId)
+
+            await updateDoc(ref, {
+                notes: arrayUnion(note),
+                removed: updatedRemovedArray
+            })
+            createEmptyNote()
+            setShowPopOver({
+                message: "The note was succesfully restored!",
+                type: "info"
+            })
+        }
     }
 
     const deleteNote = async () => {
-        const ref = doc(DB, "Notes", uid)
-        const docSnap = await getDoc(ref)
+        if (header && text) {
+            const ref = doc(DB, "Notes", uid)
+            const docSnap = await getDoc(ref)
 
-        const removedArray = docSnap.data().removed
-        const updatedRemovedArray = removedArray.filter((note) => note.id !== noteId)
+            const removedArray = docSnap.data().removed
+            const updatedRemovedArray = removedArray.filter((note) => note.id !== noteId)
 
-        await updateDoc(ref, {
-            removed: updatedRemovedArray
-        })
-        createEmptyNote()
+            await updateDoc(ref, {
+                removed: updatedRemovedArray
+            })
+            createEmptyNote()
+            setShowPopOver({
+                message: "The note was succesfully deleted!",
+                type: "info"
+            })
+        }
     }
 
     return (
         <div className={`col-lg-8 col-12 bg-primary writingContainer ${collapseOn ? "collapseOn" : null}`}>
+            <div className="w-100 position-relative">
+                <div className="col-12 operationStateContainer d-flex justify-content-center position-absolute">
+                    {showPopOver ? (
+                        createAnimatedPopOver()
+                    ) : null}
+                </div>
+            </div>
             <div className="row d-block d-sm-none">
                 <div className="col-12 py-2">
                     {!collapseOn &&
@@ -169,8 +236,12 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                     />
                 </div>
                 <div className="col-2 pt-5 p-0">
-                    <DeleteIcon className="deleteIcon" sx={{ fontSize: 40, color: "white" }} onClick={removedNotesShow ? deleteNote : (isNewNote ? null : removeNote)} />
-                    <h5 className="saveButton" onClick={removedNotesShow ? restoreNote : (isNewNote ? saveNote : updateNote)}>
+                    <DeleteIcon className="deleteIcon"
+                        sx={{ fontSize: 40, color: "white" }}
+                        onClick={removedNotesShow ? deleteNote : (isNewNote ? null : removeNote)} />
+                    <h5 className="saveButton"
+                        ref={popOverTarget}
+                        onClick={removedNotesShow ? restoreNote : (isNewNote ? saveNote : updateNote)}>
                         {removedNotesShow ? "Restore" : (isNewNote ? "Save" : "Update")}
                     </h5>
                 </div>
