@@ -5,6 +5,22 @@ Writing.js
 .writingContainer {
     border-left: 1px solid #b8C5CC;
 }
+
+.operationStateInfoSection {
+    width: fit-content;
+    border-radius: 5px;
+    padding: 5px 25px 5px 25px;
+    margin-top: 10px;
+    color: white;
+    text-align: center;
+    z-index: 1;
+}
+
+.operationStateMessage {
+    font-size: 16px;
+    margin: 0;
+}
+
 .headerSection {
     width: 100%;
     height: 35px;
@@ -13,11 +29,13 @@ Writing.js
     color: white;
     border: none;
 }
+
 ::placeholder {
     color: white;
-    opacity: 1; /* Firefox */
-  }
-  
+    opacity: 1;
+    /* Firefox */
+}
+
 .textSection {
     width: 100%;
     height: 100%;
@@ -27,30 +45,35 @@ Writing.js
     color: white;
     border: none;
 }
+
 .saveButton {
     padding-top: 10px;
     color: white;
     cursor: pointer;
 }
+
 .deleteIcon {
     cursor: pointer;
     font-size: 40;
     color: #B8C5CC;
 }
+
 .collapseOn {
-    position:absolute;
+    position: absolute;
     bottom: 0;
     height: 100%;
     animation: collapse 1.5 ease;
 }
+
 .headerSection:focus {
     outline: none;
-  }
+}
+
 .textSection:focus {
     outline: none;
-  }
-  
-  
+}
+
+
 /***********
 Sidebar.js
 ************/
@@ -58,13 +81,15 @@ Sidebar.js
     font-size: 14px;
     height: 20px;
 }
+
 .sidebarIcons {
-    color: white; 
-    border-radius: 50%; 
+    color: white;
+    border-radius: 50%;
     padding: 5px;
     margin-bottom: 15px;
     cursor: pointer;
 }
+
 
 .addIcon {
     border: 1px solid black;
@@ -81,16 +106,18 @@ Sidebar.js
     background-color: #F97068;
 
 }
+
 /*******
 Notes.js
 *********/
 .notesContainer {
-    background-color: white; 
+    background-color: white;
     overflow-y: auto;
     overflow-x: hidden;
     height: 945px;
     border-left: 1px solid rgb(206, 194, 194);
-    -ms-overflow-style: none;  /* IE and Edge */
+    -ms-overflow-style: none;
+    /* IE and Edge */
     scrollbar-width: none;
 }
 
@@ -103,10 +130,13 @@ Notes.js
     height: 80px;
     top: 0;
     background-color: white;
+    z-index: 2;
 }
+
 .currentUser {
     font-size: 16px;
 }
+
 .signOutButton {
     font-size: 16px;
     cursor: pointer;
@@ -116,26 +146,32 @@ Notes.js
     background-color: #EDF2F4;
     height: fit-content;
     cursor: pointer;
+    border-radius: 5px;
 }
+
 .savedNoteTimestamp {
     color: #9DA0A2;
     font-size: 18px;
     font-weight: bold;
 }
+
 .savedNotePreviewHeader {
     color: #9DA0A2;
     font-size: 20px;
     font-weight: bold;
 }
+
 .savedNoteTextContainer {
     word-wrap: break-word;
-    width: 100%;
+    width: 80%;
 }
+
 .savedNotePreviewText {
     color: #9DA0A2;
     font-size: 18px;
     word-wrap: break-word;
 }
+
 .savedNote.selectedSaved {
     background-color: #BBE0B6;
     transition: background-color 0.5s ease, height 0.3s ease;
@@ -170,16 +206,18 @@ Notes.js
     .notesContainer {
         height: 300px;
     }
-  }
+}
 
 @media only screen and (max-width: 576px) {
     .headerSection {
-       font-size: 24px; 
+        font-size: 24px;
     }
+
     .textSection {
         font-size: 16px;
     }
+
     .saveButton {
         font-size: 14px;
     }
-  }
+}
