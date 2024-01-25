@@ -3,7 +3,7 @@ Writing.js
 ***********/
 
 .writingContainer {
-    border-left: 1px solid #b8C5CC;
+    z-index: 2;
 }
 
 .operationStateInfoSection {
@@ -13,7 +13,6 @@ Writing.js
     margin-top: 10px;
     color: white;
     text-align: center;
-    z-index: 1;
 }
 
 .operationStateMessage {
@@ -57,14 +56,6 @@ Writing.js
     font-size: 40;
     color: #B8C5CC;
 }
-
-.collapseOn {
-    position: absolute;
-    bottom: 0;
-    height: 100%;
-    animation: collapse 1.5 ease;
-}
-
 .headerSection:focus {
     outline: none;
 }
@@ -130,7 +121,7 @@ Notes.js
     height: 80px;
     top: 0;
     background-color: white;
-    z-index: 2;
+    z-index: 1;
 }
 
 .currentUser {
@@ -204,7 +195,7 @@ Notes.js
 
 @media only screen and (max-width: 991px) {
     .notesContainer {
-        height: 300px;
+        height: 500px;
     }
 }
 
@@ -219,5 +210,8 @@ Notes.js
 
     .saveButton {
         font-size: 14px;
+    }
+    .writingContainer {
+        height: 400px;
     }
 }

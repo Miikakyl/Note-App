@@ -10,6 +10,15 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown'
 
 
 import "../styles/styles.css"
+const variants = {
+    closed: {
+    },
+    open: {
+        position: "absolute",
+        bottom: 0,
+        height: "100%"
+    }
+}
 
 const Writing = ({ uid, note, removedNotesShow }) => {
     const [header, setHeader] = useState("")
@@ -194,7 +203,10 @@ const Writing = ({ uid, note, removedNotesShow }) => {
     }
 
     return (
-        <div className={`col-lg-8 col-12 bg-primary writingContainer ${collapseOn ? "collapseOn" : null}`}>
+        <motion.div className={`col-lg-8 col-12 bg-primary writingContainer`}
+            animate={collapseOn ? "open" : "closed"}
+            variants={variants}
+            >
             <div className="w-100 position-relative">
                 <div className="col-12 operationStateContainer d-flex justify-content-center position-absolute">
                     {showPopOver ? (
@@ -202,7 +214,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                     ) : null}
                 </div>
             </div>
-            <div className="row d-block d-sm-none">
+            <div className="row d-block d-lg-none">
                 <div className="col-12 py-2">
                     {!collapseOn &&
                         <ArrowCircleUpIcon
@@ -246,7 +258,7 @@ const Writing = ({ uid, note, removedNotesShow }) => {
                     </h5>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 
