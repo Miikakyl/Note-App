@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { FIREBASE_AUTH } from "../firebaseConfig.js"
 import { DB } from "../firebaseConfig.js";
-import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; 
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -20,14 +20,27 @@ const AuthenticationModal = () => {
 
     const signIn = () => {
         signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
-          .then((userCredential) => {
-            setShow(false)
-            // ...
-          })
-          .catch((error) => {
-            const errorMessage = error.message;
-            setAuthMessage(errorMessage);
-          });
+            .then((userCredential) => {
+                setShow(false)
+                // ...
+            })
+            .catch((error) => {
+                const errorCode = error.code
+                let errorMessage = ''
+                
+                switch (errorCode) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address'
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMessage = 'Wrong email or password'
+                        break;
+                    default:
+                        errorMessage = 'An error occurred. Please try again.'
+                        break;
+                }
+                setAuthMessage(errorMessage)
+            });
     }
 
     const signUp = () => {
@@ -39,9 +52,25 @@ const AuthenticationModal = () => {
                 createNoteDocument(user.uid)
             })
             .catch((error) => {
-                const errorMessage = error.message;
-                setAuthMessage(errorMessage);
-                // ..
+                const errorCode = error.code
+                let errorMessage = ''
+
+                switch (errorCode) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address'
+                        break;
+
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already in use'
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'This password is too weak, please write password that is minimum 6 characters'
+                        break;
+                    default:
+                        errorMessage = 'An error occurred. Please try again.'
+                        break;
+                }
+                setAuthMessage(errorMessage)
             });
     }
 
@@ -49,7 +78,7 @@ const AuthenticationModal = () => {
     const createNoteDocument = async (uid) => {
         await setDoc(doc(DB, "Notes", uid), {
             notes: [],
-            deleted: []
+            removed: []
         });
     }
 

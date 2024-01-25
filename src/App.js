@@ -38,7 +38,7 @@ const App = () => {
             console.log(error)
         });
     }
-
+    
     const passNoteParameters = (note) => {
         if (note === null) {
             setNoteHighlightSwitch(!noteHighlightSwitch)
