@@ -10,7 +10,7 @@ You can clone the repository and set up the firestore if you like or just test t
 ### Setting up Firebase
 1. Create Firebase project.
 2. Go to Project overview tab and start adding firebase to web application.
-4. Replace the given firebaseConfig object in firebaseConfig.js file.
+4. Replace firebaseConfig object in firebaseConfig.js file with the given object.
 5. Go to Build tab Add authentication with email sign-in method.
 6. Go to Build tab and create Firestore database with single collection named: Notes
 
