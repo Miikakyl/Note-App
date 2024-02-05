@@ -8,6 +8,7 @@ You can clone the repository and set up the firestore if you like or just test t
     - npm install
 
 ### Setting up Firebase
+https://firebase.google.com/
 1. Create Firebase project.
 2. Go to Project overview tab and start adding firebase to web application.
 4. Replace firebaseConfig object in firebaseConfig.js file with the given object.
