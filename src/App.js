@@ -13,7 +13,7 @@ const App = () => {
     const [isSignIn, setIsSignIn] = useState(true)
     const [userData, setUserData] = useState("")
     const [note, setNote] = useState("")
-    const [noteHighlightSwitch, setNoteHighlightSwitch] = useState(false)
+    const [newNotePressed, setNewNotePressed] = useState(false)
     const [removedNotesShow, setRemovedNotesShow] = useState(false)
 
     useEffect(() => {
@@ -41,7 +41,7 @@ const App = () => {
     
     const passNoteParameters = (note) => {
         if (note === null) {
-            setNoteHighlightSwitch(!noteHighlightSwitch)
+            setNewNotePressed(!newNotePressed)
         }
         setNote(note)
     }
@@ -60,8 +60,8 @@ const App = () => {
                         passNoteParameters={passNoteParameters}
                         email={userData.email}
                         signOut={handleSignOut}
-                        noteHighlightSwitch={noteHighlightSwitch}
                         removedNotesShow={removedNotesShow}
+                        newNotePressed={newNotePressed}
                     />
                     <Writing 
                         uid={userData.uid} 

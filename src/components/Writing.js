@@ -14,7 +14,7 @@ const variants = {
     closed: {
     },
     open: {
-        position: "absolute",
+        position: "fixed",
         bottom: 0,
         height: "100%"
     }

@@ -5,10 +5,11 @@ import { motion } from "framer-motion"
 
 import "../styles/styles.css";
 
-const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, removedNotesShow }) => {
+const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, removedNotesShow, newNotePressed }) => {
     const [noteData, setNoteData] = useState(false)
     const [currentUser, setCurrentUser] = useState("")
     const [selectedNote, setSelectedNote] = useState(null)
+    const [newNoteAnimation, setNewNoteAnimation] = useState(false)
 
 
     useEffect(() => {
@@ -37,10 +38,12 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
     }, [uid, removedNotesShow])
 
 
-    /* When user click new note button the highlight of the selected note is disabled */
+    /* When user click new note button the highlight of the selected note is disabled and
+    */
     useEffect(() => {
         setSelectedNote(null)
-    }, [noteHighlightSwitch])
+        
+    }, [newNotePressed])
 
 
     const handleNoteClick = (note) => {
@@ -52,6 +55,7 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
     */
     const handleNotes = (notes) => {
         let handledNotes = notes
+        setNewNoteAnimation(false)
         
         if (handledNotes) {
             handledNotes.forEach(note => {
@@ -84,7 +88,9 @@ const Notes = ({ uid, passNoteParameters, email, signOut, noteHighlightSwitch, r
                 </h4>
             </div>
             <h4>{removedNotesShow ? "Removed Notes" : "Saved Notes"}</h4>
+            <motion.div>
 
+            </motion.div>
             {noteData && noteData.map((note) => (
                 <motion.div
                     initial={{ opacity: 0, y: "50px" }}
