@@ -1,5 +1,5 @@
 ﻿# Note-App
-Note taking application where users can create notes. Made by using React, Bootstrap, Framer Motion and Firestore.
+Made by using React, Bootstrap, Framer Motion and Firestore.
 You can clone the repository and set up the firestore if you like or just test the app from the link.
 
 ## Features
