@@ -7,11 +7,6 @@ You can clone the repository and set up the firestore if you like or just test t
 - Users can create, remove, update and delete notes.
 - Responsive
 
-## Getting Started
-1. Clone the repository
-2. Install project dependencies
-    - npm install
-
 ### Setting up Firebase
 https://firebase.google.com/
 1. Create Firebase project.
